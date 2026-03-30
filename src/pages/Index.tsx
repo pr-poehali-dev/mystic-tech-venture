@@ -14,8 +14,20 @@ const PHONE = '+79654500708'
 const PHONE_DISPLAY = '+7 (965) 450-07-08'
 const BANK = 'Т-Банк'
 
-function PaymentModal({ fileName, onClose }: { fileName: string; onClose: () => void }) {
+const MATERIALS = [
+  { id: 'PLA', label: 'PLA', price: 120 },
+  { id: 'ABS', label: 'ABS', price: 140 },
+  { id: 'PETG', label: 'PETG', price: 150 },
+]
+
+
+function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => void }) {
+  const [material, setMaterial] = useState(MATERIALS[0])
+  const [meters, setMeters] = useState('')
+  const [showPayment, setShowPayment] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  const total = material.price * (parseFloat(meters) || 0)
 
   function copyPhone() {
     navigator.clipboard.writeText(PHONE)
@@ -23,17 +35,12 @@ function PaymentModal({ fileName, onClose }: { fileName: string; onClose: () => 
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const sbpLink = `https://qr.nspk.ru/AS100003O4HBVDPFNKAP6PC5PQJKFGF0?type=02&bank=100000000111&sum=0&cur=RUB&crc=8F65`
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-sm rounded-2xl bg-[#0d1117] border border-white/10 shadow-2xl p-6 z-10">
 
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors">
           <Icon name="X" size={20} />
         </button>
 
@@ -47,54 +54,107 @@ function PaymentModal({ fileName, onClose }: { fileName: string; onClose: () => 
           </div>
         </div>
 
-        <p className="text-white/60 text-sm mb-5">
-          Мы свяжемся с вами для уточнения деталей. Для ускорения обработки — оплатите заказ заранее:
-        </p>
+        {!showPayment ? (
+          <>
+            <div className="space-y-4 mb-5">
+              <div>
+                <label className="text-white/60 text-xs mb-2 block">Материал</label>
+                <div className="flex gap-2">
+                  {MATERIALS.map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => setMaterial(m)}
+                      className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                        material.id === m.id
+                          ? 'bg-blue-500 border-blue-400 text-white'
+                          : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-white/30 text-xs mt-1.5">{material.price} ₽ / метр</p>
+              </div>
 
-        <div className="space-y-3">
-          {/* СБП */}
-          <a
-            href={`https://www.tinkoff.ru/rm/sinitsyn.ilia5/Fif5S66498`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 w-full bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/30 rounded-xl px-4 py-3.5 transition-all group"
-          >
-            <div className="w-9 h-9 rounded-full bg-yellow-400/20 flex items-center justify-center flex-shrink-0">
-              <Icon name="Zap" size={18} className="text-yellow-400" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-white font-semibold text-sm">Оплатить через СБП</p>
-              <p className="text-white/40 text-xs">{BANK} · быстро и без комиссии</p>
-            </div>
-            <Icon name="ExternalLink" size={14} className="text-white/30 group-hover:text-white/60 transition-colors" />
-          </a>
+              <div>
+                <label className="text-white/60 text-xs mb-2 block">Длина нити (метры)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={meters}
+                  onChange={e => setMeters(e.target.value)}
+                  placeholder="0"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-blue-400/60 transition-colors"
+                />
+              </div>
 
-          {/* Перевод */}
-          <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5">
-            <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-              <Icon name="Smartphone" size={18} className="text-white/60" />
+              {total > 0 && (
+                <div className="flex items-center justify-between bg-blue-500/10 border border-blue-400/20 rounded-xl px-4 py-3">
+                  <span className="text-white/60 text-sm">Стоимость</span>
+                  <span className="text-white font-bold text-lg">{total.toLocaleString('ru-RU')} ₽</span>
+                </div>
+              )}
             </div>
-            <div className="flex-1">
-              <p className="text-white font-semibold text-sm">Перевод по номеру</p>
-              <p className="text-white/60 text-sm font-mono mt-0.5">{PHONE_DISPLAY}</p>
-              <p className="text-white/30 text-xs">{BANK}</p>
-            </div>
+
             <button
-              onClick={copyPhone}
-              className="text-white/40 hover:text-blue-400 transition-colors flex-shrink-0"
-              title="Скопировать номер"
+              onClick={() => setShowPayment(true)}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30"
             >
-              {copied
-                ? <Icon name="Check" size={16} className="text-green-400" />
-                : <Icon name="Copy" size={16} />
-              }
+              Перейти к оплате
             </button>
-          </div>
-        </div>
+          </>
+        ) : (
+          <>
+            {total > 0 && (
+              <div className="flex items-center justify-between bg-blue-500/10 border border-blue-400/20 rounded-xl px-4 py-3 mb-4">
+                <span className="text-white/60 text-sm">{material.label} · {meters} м</span>
+                <span className="text-white font-bold text-lg">{total.toLocaleString('ru-RU')} ₽</span>
+              </div>
+            )}
 
-        <p className="text-white/30 text-xs text-center mt-4">
-          После оплаты укажите в комментарии название файла
-        </p>
+            <p className="text-white/60 text-sm mb-4">
+              Мы свяжемся с вами для уточнения деталей. Для ускорения обработки — оплатите заказ заранее:
+            </p>
+
+            <div className="space-y-3">
+              <a
+                href="https://www.tinkoff.ru/rm/sinitsyn.ilia5/Fif5S66498"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 w-full bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/30 rounded-xl px-4 py-3.5 transition-all group"
+              >
+                <div className="w-9 h-9 rounded-full bg-yellow-400/20 flex items-center justify-center flex-shrink-0">
+                  <Icon name="Zap" size={18} className="text-yellow-400" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-white font-semibold text-sm">Оплатить через СБП</p>
+                  <p className="text-white/40 text-xs">{BANK} · быстро и без комиссии</p>
+                </div>
+                <Icon name="ExternalLink" size={14} className="text-white/30 group-hover:text-white/60 transition-colors" />
+              </a>
+
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5">
+                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <Icon name="Smartphone" size={18} className="text-white/60" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-semibold text-sm">Перевод по номеру</p>
+                  <p className="text-white/60 text-sm font-mono mt-0.5">{PHONE_DISPLAY}</p>
+                  <p className="text-white/30 text-xs">{BANK}</p>
+                </div>
+                <button onClick={copyPhone} className="text-white/40 hover:text-blue-400 transition-colors flex-shrink-0">
+                  {copied ? <Icon name="Check" size={16} className="text-green-400" /> : <Icon name="Copy" size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <p className="text-white/30 text-xs text-center mt-4">
+              После оплаты укажите в комментарии название файла
+            </p>
+          </>
+        )}
       </div>
     </div>
   )
@@ -212,9 +272,8 @@ export default function Index() {
         </footer>
       </div>
 
-      {/* Payment Modal */}
       {uploadedFile && (
-        <PaymentModal
+        <OrderForm
           fileName={uploadedFile}
           onClose={() => setUploadedFile(null)}
         />

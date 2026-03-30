@@ -221,18 +221,11 @@ export default function Index() {
       <div className="absolute inset-0 flex flex-col pointer-events-none">
 
         {/* Header */}
-        <header className="flex items-center justify-between px-8 py-5 pointer-events-auto">
+        <header className="flex items-center px-8 py-5 pointer-events-auto">
           <div className="flex items-center gap-2">
             <Icon name="Layers" size={28} className="text-blue-400" />
             <span className="text-white font-bold text-2xl tracking-tight">PrintLab</span>
           </div>
-          <a
-            href={`tel:${PHONE}`}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium transition-all"
-          >
-            <Icon name="Phone" size={16} />
-            Связаться
-          </a>
         </header>
 
         {/* Main Content */}

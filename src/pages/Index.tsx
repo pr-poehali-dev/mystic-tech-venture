@@ -24,10 +24,13 @@ const MATERIALS = [
 function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => void }) {
   const [material, setMaterial] = useState(MATERIALS[0])
   const [meters, setMeters] = useState('')
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [showPayment, setShowPayment] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const total = material.price * (parseFloat(meters) || 0)
+  const canProceed = name.trim().length > 0 && phone.trim().length > 0
 
   function copyPhone() {
     navigator.clipboard.writeText(PHONE)
@@ -90,6 +93,28 @@ function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => voi
                 />
               </div>
 
+              <div>
+                <label className="text-white/60 text-xs mb-2 block">Ваше имя</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Иван Иванов"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-blue-400/60 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="text-white/60 text-xs mb-2 block">Телефон для связи</label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="+7 (___) ___-__-__"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-blue-400/60 transition-colors"
+                />
+              </div>
+
               {total > 0 && (
                 <div className="flex items-center justify-between bg-blue-500/10 border border-blue-400/20 rounded-xl px-4 py-3">
                   <span className="text-white/60 text-sm">Стоимость</span>
@@ -100,19 +125,30 @@ function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => voi
 
             <button
               onClick={() => setShowPayment(true)}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30"
+              disabled={!canProceed}
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30"
             >
               Перейти к оплате
             </button>
           </>
         ) : (
           <>
-            {total > 0 && (
-              <div className="flex items-center justify-between bg-blue-500/10 border border-blue-400/20 rounded-xl px-4 py-3 mb-4">
-                <span className="text-white/60 text-sm">{material.label} · {meters} м</span>
-                <span className="text-white font-bold text-lg">{total.toLocaleString('ru-RU')} ₽</span>
+            <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-4 space-y-1">
+              <div className="flex items-center gap-2 text-white/60 text-sm">
+                <Icon name="User" size={14} className="text-white/40" />
+                <span>{name}</span>
               </div>
-            )}
+              <div className="flex items-center gap-2 text-white/60 text-sm">
+                <Icon name="Phone" size={14} className="text-white/40" />
+                <span>{phone}</span>
+              </div>
+              {total > 0 && (
+                <div className="flex items-center justify-between pt-1 border-t border-white/10 mt-2">
+                  <span className="text-white/60 text-sm">{material.label} · {meters} м</span>
+                  <span className="text-white font-bold">{total.toLocaleString('ru-RU')} ₽</span>
+                </div>
+              )}
+            </div>
 
             <p className="text-white/60 text-sm mb-4">
               Мы свяжемся с вами для уточнения деталей. Для ускорения обработки — оплатите заказ заранее:

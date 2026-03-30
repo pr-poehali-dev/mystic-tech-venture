@@ -20,6 +20,18 @@ const MATERIALS = [
   { id: 'PETG', label: 'PETG', price: 150 },
 ]
 
+const STATS = [
+  { value: '500+', label: 'выполненных заказов' },
+  { value: '3', label: 'года на рынке' },
+  { value: '98%', label: 'довольных клиентов' },
+]
+
+const WORKS = [
+  { img: 'https://cdn.poehali.dev/projects/c55dde27-5c68-4d96-a781-a6e4425c8c6a/files/e645ce69-0374-435e-9b10-5a59743c5d26.jpg', title: 'Механические детали', material: 'PLA' },
+  { img: 'https://cdn.poehali.dev/projects/c55dde27-5c68-4d96-a781-a6e4425c8c6a/files/6ccb08e3-c39a-431b-a229-1eea88ac1515.jpg', title: 'Фигурки и статуэтки', material: 'PETG' },
+  { img: 'https://cdn.poehali.dev/projects/c55dde27-5c68-4d96-a781-a6e4425c8c6a/files/3a4e479c-fd63-47d2-bd41-849ec624220c.jpg', title: 'Органайзеры и подставки', material: 'PLA' },
+]
+
 
 function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => void }) {
   const [material, setMaterial] = useState(MATERIALS[0])
@@ -206,19 +218,21 @@ export default function Index() {
   }
 
   return (
-    <div className="w-full h-screen relative overflow-hidden">
-      {/* 3D Background */}
-      <Canvas
-        camera={{ position: [0, 0, 500], fov: 50, near: 1, far: 10000 }}
-        gl={{ alpha: false }}
-        scene={{ background: null }}
-      >
-        <KinectScene />
-      </Canvas>
-      <Leva collapsed={true} />
+    <div className="w-full min-h-screen relative overflow-x-hidden">
+      {/* 3D Background — фиксированный только для первого экрана */}
+      <div className="fixed inset-0 -z-10 h-screen">
+        <Canvas
+          camera={{ position: [0, 0, 500], fov: 50, near: 1, far: 10000 }}
+          gl={{ alpha: false }}
+          scene={{ background: null }}
+        >
+          <KinectScene />
+        </Canvas>
+        <Leva collapsed={true} />
+      </div>
 
       {/* Overlay UI */}
-      <div className="absolute inset-0 flex flex-col pointer-events-none">
+      <div className="flex flex-col pointer-events-none h-screen">
 
         {/* Header */}
         <header className="flex items-center px-8 py-5 pointer-events-auto">
@@ -295,11 +309,48 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="flex items-center justify-center py-4 pointer-events-none">
-          <p className="text-white/30 text-xs">© 2026 PrintLab — профессиональная 3D-печать</p>
-        </footer>
       </div>
+
+      {/* Счётчик */}
+      <section className="relative bg-black/60 backdrop-blur-xl border-t border-white/10 pointer-events-auto">
+        <div className="max-w-3xl mx-auto px-6 py-12 grid grid-cols-3 gap-6 text-center">
+          {STATS.map((s, i) => (
+            <div key={i}>
+              <p className="text-white text-4xl font-extrabold">{s.value}</p>
+              <p className="text-white/50 text-sm mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Примеры работ */}
+      <section className="relative bg-[#080c12] pointer-events-auto">
+        <div className="max-w-4xl mx-auto px-6 py-14">
+          <h2 className="text-white text-3xl font-bold text-center mb-8">Примеры работ</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {WORKS.map((w, i) => (
+              <div key={i} className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 group">
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={w.img}
+                    alt={w.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4">
+                  <p className="text-white font-semibold">{w.title}</p>
+                  <span className="inline-block mt-1 text-xs bg-blue-500/20 text-blue-400 border border-blue-400/20 rounded-full px-2.5 py-0.5">{w.material}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative bg-[#080c12] border-t border-white/5 pointer-events-auto">
+        <p className="text-white/30 text-xs text-center py-5">© 2026 PrintLab — профессиональная 3D-печать</p>
+      </footer>
 
       {/* Кнопки связи */}
       <div className="fixed bottom-6 right-6 flex flex-col items-end gap-2 z-50">

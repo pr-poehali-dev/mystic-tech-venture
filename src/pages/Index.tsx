@@ -15,15 +15,9 @@ const PHONE_DISPLAY = '+7 (965) 450-07-08'
 const BANK = 'Т-Банк'
 
 const MATERIALS = [
-  { id: 'PLA', label: 'PLA', price: 120 },
-  { id: 'ABS', label: 'ABS', price: 140 },
-  { id: 'PETG', label: 'PETG', price: 150 },
-]
-
-const STATS = [
-  { value: '500+', label: 'выполненных заказов' },
-  { value: '3', label: 'года на рынке' },
-  { value: '98%', label: 'довольных клиентов' },
+  { id: 'PLA', label: 'PLA', price: 5 },
+  { id: 'ABS', label: 'ABS', price: 6 },
+  { id: 'PETG', label: 'PETG', price: 7 },
 ]
 
 const WORKS = [
@@ -35,13 +29,13 @@ const WORKS = [
 
 function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => void }) {
   const [material, setMaterial] = useState(MATERIALS[0])
-  const [meters, setMeters] = useState('')
+  const [grams, setGrams] = useState('')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [showPayment, setShowPayment] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const total = material.price * (parseFloat(meters) || 0)
+  const total = material.price * (parseFloat(grams) || 0)
   const canProceed = name.trim().length > 0 && phone.trim().length > 0
 
   function copyPhone() {
@@ -89,17 +83,17 @@ function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => voi
                     </button>
                   ))}
                 </div>
-                <p className="text-white/30 text-xs mt-1.5">{material.price} ₽ / метр</p>
+                <p className="text-white/30 text-xs mt-1.5">{material.price} ₽ / грамм</p>
               </div>
 
               <div>
-                <label className="text-white/60 text-xs mb-2 block">Длина нити (метры)</label>
+                <label className="text-white/60 text-xs mb-2 block">Вес модели (граммы)</label>
                 <input
                   type="number"
                   min="0"
-                  step="0.1"
-                  value={meters}
-                  onChange={e => setMeters(e.target.value)}
+                  step="1"
+                  value={grams}
+                  onChange={e => setGrams(e.target.value)}
                   placeholder="0"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-blue-400/60 transition-colors"
                 />
@@ -156,7 +150,7 @@ function OrderForm({ fileName, onClose }: { fileName: string; onClose: () => voi
               </div>
               {total > 0 && (
                 <div className="flex items-center justify-between pt-1 border-t border-white/10 mt-2">
-                  <span className="text-white/60 text-sm">{material.label} · {meters} м</span>
+                  <span className="text-white/60 text-sm">{material.label} · {grams} г</span>
                   <span className="text-white font-bold">{total.toLocaleString('ru-RU')} ₽</span>
                 </div>
               )}
@@ -310,18 +304,6 @@ export default function Index() {
         </div>
 
       </div>
-
-      {/* Счётчик */}
-      <section className="relative bg-black/60 backdrop-blur-xl border-t border-white/10 pointer-events-auto">
-        <div className="max-w-3xl mx-auto px-6 py-12 grid grid-cols-3 gap-6 text-center">
-          {STATS.map((s, i) => (
-            <div key={i}>
-              <p className="text-white text-4xl font-extrabold">{s.value}</p>
-              <p className="text-white/50 text-sm mt-1">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Примеры работ */}
       <section className="relative bg-[#080c12] pointer-events-auto">
